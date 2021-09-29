@@ -2,8 +2,29 @@ import { Container } from "./styles";
 import incomeImg from '../../assets/income.svg';
 import outcomeImg from '../../assets/outcome.svg';
 import totalImg from '../../assets/total.svg';
+import { useTransactions } from "../../hooks/useTransactions";
+
 
 export function Summary(){
+  const {transactions} = useTransactions();
+
+  const summary= transactions.reduce((acc, transaction)=>{
+    if(transaction.type==='deposit'){
+      acc.deposits+=transaction.amount;
+      acc.total+=transaction.amount;
+    }else{
+      acc.withdraws += transaction.amount;
+      acc.total-=transaction.amount;
+    }
+
+    return acc;
+
+  },{
+    deposits:0,
+    withdraws:0,
+    total:0
+  })
+    
   return (
     <Container>
       <div>
@@ -11,7 +32,14 @@ export function Summary(){
           <p>Entradas</p>
           <img src={incomeImg} alt="Entradas" />
         </header>
-        <strong>5675.00 Mt</strong>
+        <strong>
+          {
+            new Intl.NumberFormat('pt-MZ',{
+              style:'currency' ,
+              currency:'MZN'
+            }).format(summary.deposits)
+          }
+        </strong>
       </div>
 
       <div>
@@ -19,7 +47,14 @@ export function Summary(){
           <p>Saidas</p>
           <img src={outcomeImg} alt="Saidas" />
         </header>
-        <strong>-4605.00 Mt</strong>
+        <strong>
+          -{
+            new Intl.NumberFormat('pt-MZ',{
+              style:'currency' ,
+              currency:'MZN'
+            }).format(summary.withdraws)
+          }
+        </strong>
       </div>
 
       <div className="highlight_background">
@@ -27,7 +62,14 @@ export function Summary(){
           <p>Total</p>
           <img src={totalImg} alt="Total" />
         </header>
-        <strong>1070.00 Mt</strong>
+        <strong>
+          {
+            new Intl.NumberFormat('pt-MZ',{
+              style:'currency' ,
+              currency:'MZN'
+            }).format(summary.total)
+          }
+        </strong>
       </div>
     </Container>
   );
